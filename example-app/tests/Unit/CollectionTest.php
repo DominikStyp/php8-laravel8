@@ -15,7 +15,7 @@ class CollectionTest extends TestCase{
     /**
      * @var \Illuminate\Support\Collection
      */
-    private $c;
+    private $collection;
     protected function setUp(): void {
         $this->collection = collect([
             [
@@ -48,6 +48,9 @@ class CollectionTest extends TestCase{
         parent::setUp();
     }
 
+    /**
+     * filter() expects TRUE to keep the element
+     */
     public function testFilter() {
         $withEmails = $this->collection->filter(function ($el) {
             return !empty($el['email']);
@@ -59,6 +62,50 @@ class CollectionTest extends TestCase{
         $this->assertEquals('user2@user2.example.com', $withEmails->get(2)['email']);
     }
 
+    /**
+     * reject() expects TRUE to remove the element
+     */
+    public function testReject(){
+        $withEmails = $this->collection->reject(function ($el) {
+            return empty($el['email']);
+        });
+        $this->assertCount(1, $withEmails);
+        /**
+         * WARNING! after filter keys are preserved
+         */
+        $this->assertEquals('user2@user2.example.com', $withEmails->get(2)['email']);
+    }
+
+    public function testSkip(){
+        $c = collect(range(1,10));
+        // skips first 5 elements
+        $c1 = $c->skip(5);
+        $this->assertCount(5, $c1);
+        $this->assertEquals(6, $c1->first());
+    }
+
+    public function testSkipUntil(){
+        $c = collect(range(1,10));
+        // skips elements UNTIL callback returns TRUE
+        $c1 = $c->skipUntil(function($el) {
+            return $el > 5;
+        });
+        $this->assertCount(5, $c1);
+        $this->assertEquals(6, $c1->first());
+    }
+
+    // same as skipUntil() but expects reversed boolean condition
+    public function testSkipWhile(){
+        $c = collect(range(1,10));
+        // skips elements WHILE callback returns TRUE
+        $c1 = $c->skipWhile(function($el) {
+            return $el <= 5;
+        });
+        $this->assertCount(5, $c1);
+        $this->assertEquals(6, $c1->first());
+    }
+
+    // sorting
     public function testSort() {
         $sorted = $this->collection->sort(function ($el1, $el2) {
             return $el1['surname'] <=> $el2['surname'] ; // less than = -1, equals = 0, greater than = 1
@@ -69,6 +116,7 @@ class CollectionTest extends TestCase{
         $this->assertEquals('zzz', $sorted->last()['surname']);
     }
 
+    // mapping
     public function testMap() {
         $mapped = $this->collection->map(function ($el, $index){
            $el['surname'] = Str::ucfirst($el['surname']);
@@ -602,6 +650,182 @@ class CollectionTest extends TestCase{
          * values() is resetting the collection keys from 0, 2, 4 to 0, 1, 2
          */
         $this->assertEquals('eeeee', $long->values()[2]);
-        $this->assertEquals('d', $short->values()[1]);    }
+        $this->assertEquals('d', $short->values()[1]);
+    }
+
+    public function testPipe(){
+        $c = collect(range(1,20));
+        $ret = $c
+          ->pipe(function (Collection $c){
+            return $c->transform(function ($el){
+                return $el*2;
+            });
+        })->pipe(function(Collection $c){
+                list($lower, $higher) = $c->partition(function($el){
+                    return $el <= 20;
+                });
+                return $higher;
+        })->pipe(function(Collection $c){
+            return $c->reverse();
+        });
+        $this->assertEquals(40, $ret->first());
+        $this->assertEquals(22, $ret->last());
+        $this->assertCount(10, $ret);
+    }
+
+    public function testPluck(){
+        $c = collect([
+            ['id' => 1, 'name' => 'name1', 'role' => 'admin'],
+            ['id' => 2, 'name' => 'name2', 'role' => 'user'],
+            ['id' => 33, 'name' => 'name3', 'role' => 'admin'],
+        ]);
+        $idsOnly = $c->pluck('id');
+        $this->assertEquals(1, $idsOnly[0]);
+        $this->assertEquals(2, $idsOnly[1]);
+        $this->assertEquals(33, $idsOnly[2]);
+    }
+
+    /**
+     * Removing, appending, prepending elements
+     */
+    public function testPopPrependPush(){
+        /**
+         * WARNING pop() prepend() and push() operate on the ORIGINAL collection by reference
+         */
+        $c = collect([1,2,3]);
+        // pop
+        $el = $c->pop();
+        $this->assertEquals(3, $el);
+        $this->assertCount(2, $c);
+        // prepend
+        $c->prepend(5);
+        $this->assertEquals(5, $c->first());
+        $this->assertCount(3, $c);
+        // push
+        $c->push(6);
+        $this->assertEquals(6, $c->last());
+        $this->assertCount(4, $c);
+    }
+
+    public function testShift(){
+        $c = collect([10,2,3]);
+        $shifted = $c->shift();
+        $this->assertEquals(10, $shifted);
+        $this->assertCount(2, $c);
+    }
+
+    public function testPull(){
+        $c = collect(['id' => 1, 'name' => 'name1', 'role' => 'admin']);
+        // pulls element by key and removes it from collection
+        $name = $c->pull('name');
+        $this->assertEquals('name1', $name);
+        $this->assertCount(2, $c);
+    }
+
+    public function testPut(){
+        $c = collect(['id' => 1, 'name' => 'name1', 'role' => 'admin']);
+        // places element at certain key
+        $c->put('role', 'mod');
+        $this->assertCount(3, $c);
+        $this->assertEquals('mod', $c['role']);
+    }
+
+    public function testReduce(){
+        $c = collect([1,2,4,8,16,32,64,128]);
+        // reduce() iterate on collection,
+        // remembers returned state to $carry
+        // returns final $carry result in the end
+        $sum = $c->reduce(function ($carry, $item){
+            return $carry + $item;
+        });
+        $this->assertEquals(255, $sum);
+        $sameCollection = $c->reduce(function ($carry, $item){
+            return collect($carry)->push($item);
+        });
+        $this->assertEquals($c->count(), $sameCollection->count());
+        $this->assertEquals($c->get(1), $sameCollection->get(1));
+        $this->assertEquals($c->last(), $sameCollection->last());
+    }
+
+    public function testReduceWithKeys(){
+        $collection = collect([
+            'usd' => 1400,
+            'gbp' => 1200,
+            'eur' => 1000,
+        ]);
+
+        $ratio = [
+            'usd' => 1,
+            'gbp' => 1.37,
+            'eur' => 1.22,
+        ];
+        $balanceSum = $collection->reduceWithKeys(function ($carry, $value, $key) use ($ratio) {
+            return $carry + ($value * $ratio[$key]);
+        });
+        $this->assertEquals(4264, $balanceSum);
+    }
+
+    public function testReplace(){
+        /**
+         * replace() method will also overwrite items in the collection that have matching numeric keys
+         */
+        $c = collect(['one', 'two' => 'two', 'three']);
+        $replaced = $c->replace([
+            'two' => 'two_1',
+            2 => 'three_1'
+        ]);
+        $this->assertEquals('one', $replaced[0]);
+        $this->assertEquals('two_1', $replaced['two']);
+        $this->assertEquals('three_1', $replaced[2]);
+    }
+
+    public function testReplaceRecursive(){
+        $config1 = [
+            'db' => [
+                'user' => 'u1',
+                'pass' => 'p1',
+                'modules' => [
+                    'm1', 'm2'
+                ]
+            ]
+        ];
+        $config2 = [
+            'db' => [
+                'pass' => '',
+                'modules' => [
+                    'm3'
+                ]
+            ]
+        ];
+        $c = collect($config1);
+        /**
+         * WARNING! array elements are replaces according to their keys: 0, 1..etc.
+         * Arrays are not FULLY REPLACED like you may expect
+         */
+        $replaced = $c->replaceRecursive($config2);
+        $this->assertEquals('u1', $replaced['db']['user']);
+        $this->assertEquals('', $replaced['db']['pass']);
+        $this->assertCount(2, $replaced['db']['modules']);
+        $this->assertEquals('m3', $replaced['db']['modules'][0]);
+        $this->assertEquals('m2', $replaced['db']['modules'][1]);
+    }
+
+    // searching by value
+    public function testSearch(){
+        $c = collect(['one', 'nine', 'ten', 'eleven']);
+        // searches key by value
+        $this->assertEquals(2, $c->search('ten'));
+    }
+
+    public function testSlice(){
+        $c = collect(range(1,10));
+        // offset number of elements are skipped
+        // length number of elements are included
+        $sliced = $c->slice(4, 3)->values();
+        $this->assertEquals(5, $sliced[0]);
+        $this->assertEquals(6, $sliced[1]);
+        $this->assertEquals(7, $sliced[2]);
+        $this->assertCount(3, $sliced);
+    }
 
 }
