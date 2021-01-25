@@ -963,6 +963,7 @@ class CollectionTest extends TestCase{
         $this->assertEquals(1, $desc->last());
     }
 
+
     public function testSplice(){
         $c = collect([1, 2, 3, 4, 5]);
         $chunk = $c->splice(2, 1);
