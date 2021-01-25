@@ -341,6 +341,7 @@ class CollectionTest extends TestCase{
 
     }
 
+    // filter by value
     public function testEvery() {
         $strs = collect([
             'aa', 'bb', '', 'c', 'dd', '1', null
@@ -352,6 +353,7 @@ class CollectionTest extends TestCase{
         $this->assertFalse($check);
     }
 
+    // filter keys
     public function testExcept(){
         $users = collect([
             ['id' => 1, 'name' => 'name1', 'email' => 'email1@s.com', 'password' => '123'],
@@ -363,12 +365,13 @@ class CollectionTest extends TestCase{
         $this->assertTrue(empty($noIds[0]['password']));
         $this->assertTrue(empty($noIds[1]['id']));
     }
-
+    // filter by value
     public function testFilter1(){
         $res = collect([1,2,3,4,5])->filter(function($el){ return $el % 2 === 0; });
         $this->assertCount(2, $res);
     }
 
+    // filter by value equals
     public function testFirstWhere(){
         $person = collect([
             ['name' => "Joe", 'id' => 1],
@@ -378,11 +381,66 @@ class CollectionTest extends TestCase{
         $this->assertEquals('Barrack', $person['name']);
     }
 
+    // filter by value quals
+    public function testWhere(){
+        $c = collect([
+            ['name' => "Joe", 'id' => 1],
+            ['name' => "Donald", 'id' => 2],
+            ['name' => "Barrack", 'id' => 3],
+            ['name' => "Joe", 'id' => 4],
+        ]);
+        $filtered = $c->where('name', 'Joe');
+        $this->assertCount(2, $filtered);
+    }
+
+    // filter by value in range
+    public function testWhereBetweenAndNotBetween(){
+        $c = collect([
+            ['name' => "Joe", 'id' => 1],
+            ['name' => "Donald", 'id' => 2],
+            ['name' => "Barrack", 'id' => 3],
+            ['name' => "Joe", 'id' => 4],
+            ['name' => "Stan", 'id' => 5],
+        ]);
+
+        $filtered = $c->whereBetween('id', [2,4]);
+        $this->assertCount(3, $filtered);
+        $this->assertEquals("Donald", $filtered->first()["name"]);
+        $this->assertEquals("Joe", $filtered->last()["name"]);
+
+        $filteredInverse = $c->whereNotBetween('id', [2,4]);
+        $this->assertCount(2, $filteredInverse);
+        $this->assertEquals("Joe", $filteredInverse->first()["name"]);
+        $this->assertEquals("Stan", $filteredInverse->last()["name"]);
+    }
+
+
+    public function testWhereInAndNotIn(){
+        $c = collect([
+            ['name' => "Joe", 'id' => 1],
+            ['name' => "Donald", 'id' => 2],
+            ['name' => "Barrack", 'id' => 3],
+            ['name' => "Joe1", 'id' => 4],
+            ['name' => "Stan", 'id' => 5],
+        ]);
+
+        $filtered = $c->whereIn('id', [2,5]);
+        $this->assertCount(2, $filtered);
+        $this->assertEquals("Donald", $filtered->first()["name"]);
+        $this->assertEquals("Stan", $filtered->last()["name"]);
+
+        $filtered = $c->whereNotIn('id', [2,5]);
+        $this->assertCount(3, $filtered);
+        $this->assertEquals("Joe", $filtered->first()["name"]);
+        $this->assertEquals("Joe1", $filtered->last()["name"]);
+    }
+
     public function testFlatMap(){
         $configs = collect([
             ['app_key' => '123_gggg', 'user_key' => '456-hhh'],
             ['user_email' => 'u@ux.com', 'some_other_key' => 'xxxx']
         ]);
+
         $flat = $configs->flatMap(function($values){ // only values of all keys are passed here
             return array_map('strtoupper', $values);
         });
@@ -475,6 +533,7 @@ class CollectionTest extends TestCase{
         $this->assertTrue( $grouped['admin']->every(function($e){ return $e['role'] === 'admin';  }) );
     }
 
+    // search by value
     public function testHas() {
         /**
          * WARNING! If key does not have value, has() returns false
@@ -487,10 +546,13 @@ class CollectionTest extends TestCase{
         );
     }
 
+    // search by common part
+    // merge/join collection
     public function testIntersect() {
         $roles = ['admin', 'mod', 'subsriber', 'new', 'inactive'];
         $cnt = collect(['user'])->intersect($roles)->count();
         $this->assertEquals(0, $cnt);
+
         $commonRoles = collect(['admin','some_role', 'other_role', 'new'])
             ->intersect($roles);
         $this->assertTrue( $commonRoles->contains('admin') );
@@ -498,6 +560,8 @@ class CollectionTest extends TestCase{
         $this->assertEquals(2, $commonRoles->count());
     }
 
+    // search by common keys
+    // merge/join collection
     public function testIntersectByKeys() {
         $c = collect([
             'x' => 'xx',
@@ -519,6 +583,7 @@ class CollectionTest extends TestCase{
         $this->assertTrue( $intersect->has('z') );
     }
 
+    // merge/join collection
     public function testJoinWithLast() {
         $c = ['a', 'b', 'c', 'd', 'e'];
         $str1 = collect($c)->join(',', ' AND ');
@@ -910,16 +975,201 @@ class CollectionTest extends TestCase{
     }
 
     public function testSplit(){
-        $c = collect([1, 2, 3, 4, 5, 6]);
+        // if there is MORE elements than even groups
+        // first group will have more elements
+        // last will always have less nr of elements
+        $c = collect(range(1,20));
         $chunks = $c->split(3);
-        foreach($chunks as $chunk){
-            $this->assertCount(2, $chunk);
-        }
+        $this->assertCount(7, $chunks[0]);
+        $this->assertCount(7, $chunks[1]);
+        $this->assertCount(6, $chunks[2]);
+
+        // difference split() vs splitIn() here is
+        // that split() distributes items to groups MOST evenly possible
+        // ex: 1,1,0 ... 1,1,1 ... 2,1,1 ... 2,2,1... 2,2,2... 3,2,2 etc...
+        $c = collect(range(1,22));
+        $chunks = $c->split(3);
+        $this->assertCount(8, $chunks[0]);
+        $this->assertCount(7, $chunks[1]);
+        $this->assertCount(7, $chunks[2]);
+
+
     }
 
     public function testSplitIn(){
-        $c = collect([]);
-        $this->assertCount(0, $c);
+        $c = collect(range(1,20));
+        $chunks = $c->splitIn(3);
+        $this->assertCount(7, $chunks[0]);
+        $this->assertCount(7, $chunks[1]);
+        $this->assertCount(6, $chunks[2]);
+
+        // difference between split() vs splitIn() here:
+        // 8, 7, 7  vs 8, 8, 6
+        // this is because splitIn() tries to fill-in groups
+        // to max (8) elements and then allocate remainder to the last group
+        $c = collect(range(1,22));
+        $chunks = $c->splitIn(3);
+        $this->assertCount(8, $chunks[0]);
+        $this->assertCount(8, $chunks[1]);
+        $this->assertCount(6, $chunks[2]);
     }
+
+    public function testTake(){
+        $c = collect(str_split("How are you"));
+        $this->assertEquals("How", $c->take(3)->join(""));
+        $this->assertEquals("you", $c->take(-3)->join(""));
+        $c = collect(str_split("How are you"));
+    }
+
+    public function testTakeUntilAndWhile(){
+        $c = collect(str_split("How are you? I'm fine."));
+        /**
+         * WARNING! We cannot go backwards with it
+         */
+
+        $str1 = $c->takeUntil(function (string $el){
+            return $el === "?";
+        })->join("");
+
+        $str2 = $c->takeWhile(function (string $el){
+            return $el !== "?";
+        })->join("");
+
+        $this->assertEquals("How are you", $str1);
+        $this->assertEquals("How are you", $str2);
+    }
+
+    public function testTap(){
+        $c = collect([2, 4, 3, 1, 10, 5]);
+        $sorted = $c->sort()
+           ->tap(function (Collection $col){
+               $this->assertEquals(1, $col->first());
+               $this->assertEquals(10, $col->last());
+               $col->shift(); //does not affect original collection here
+               $col->reject(function ($el){
+                   return true;
+               });
+           })
+            ->slice(1)
+            ->tap(function ($col){
+                $this->assertEquals(2, $col->first());
+                $this->assertEquals(10, $col->last());
+            });
+        $this->assertEquals(2, $sorted->first());
+        $this->assertEquals(10, $sorted->last());
+    }
+
+    public function testTimes(){
+        $c = Collection::times(10, function($num){
+            return pow($num, 2);
+        });
+        $this->assertEquals(1 ,$c->get(0));
+        $this->assertEquals(4 ,$c->get(1));
+        $this->assertEquals(9 ,$c->get(2));
+        $this->assertEquals(16 ,$c->get(3));
+    }
+
+    public function testUnion(){
+        $c = collect([
+            1 => ['a'],
+            2 => ['b']
+        ]);
+        $union = $c->union([
+            1 => ['b'],
+            3 => ['c']
+        ]);
+        /**
+         * WARNING! union prefers ORIGINAL values and not overrides them if they exist
+         */
+        $this->assertEquals($union[1][0], 'a');
+        $this->assertEquals($union[3][0], 'c') ;
+    }
+
+    public function testUnique(){
+        $c = collect([1,1,1,2,2,3,4,5]);
+        $this->assertCount(5, $c->unique());
+    }
+
+    public function testUnless(){
+        $c = collect([1,2,3]);
+        /**
+         * WARNING! those functions are NOT loop-like
+         * They are invoked only once
+         * unless() is invoked when first argument is FALSE
+         */
+        $c->unless(false, function ($col){
+           $col->push(4);
+        });
+        $this->assertCount(4, $c);
+        $this->assertEquals(4, $c->last());
+    }
+
+    public function testWhen(){
+        $c = collect([1,2,3]);
+        /**
+         * WARNING! those functions are NOT loop-like
+         * They are invoked only once
+         * when() is invoked when first argument is TRUE
+         */
+        $c->when(false, function ($col){
+            $col->push(4);
+        });
+        $this->assertCount(3, $c);
+        $this->assertEquals(3, $c->last());
+    }
+
+    public function testUnwrap(){
+        /**
+         * unwrap() returns collection's underlying items
+         * in this case this is array
+         */
+        $c = Collection::unwrap( collect([1,2,3]) );
+        $this->assertIsArray($c);
+        $this->assertCount(3, $c);
+        $str = Collection::unwrap( 'str' );
+        $this->assertIsString($str);
+    }
+
+    public function testWhereNullAndNotNull(){
+        $c = collect([
+            ['id' => 1, 'name' => "Joe"],
+            ['id' => 2, 'name' => "Donald"],
+            ['id' => 3, 'name' => null],
+            ['id' => 4, 'name' => "George"],
+            ['id' => 5, 'name' => null],
+        ]);
+        $this->assertCount(3, $c->whereNotNull('name'));
+        $this->assertCount(2, $c->whereNull('name'));
+    }
+
+    public function testWrap(){
+        $c = Collection::wrap(['John Doe']);
+        $this->assertInstanceOf(Collection::class, $c);
+        $this->assertCount(1, $c);
+    }
+
+    // merge/join collection
+    public function testZip(){
+        $c = collect(['one', 'two', 'three']);
+        $a = [1, 2];
+
+        /**
+         * Difference between crossJoin and this is merging only FIRST combination
+         * so 'one', 1  ... without 'one', 2 etc.
+         */
+        $zipped = $c->zip($a);
+        $this->assertEquals('one', $zipped[0][0]);
+        $this->assertEquals(1, $zipped[0][1]);
+
+        $this->assertEquals('two', $zipped[1][0]);
+        $this->assertEquals(2, $zipped[1][1]);
+
+        $this->assertEquals('three', $zipped[2][0]);
+        $this->assertEquals(null, $zipped[2][1]);
+    }
+
+
+
+
 
 }
