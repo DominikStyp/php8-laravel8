@@ -36,7 +36,9 @@ class LazyCollectionsTest extends TestCase
 
     private function getLazyFileReader() : LazyCollection {
         return LazyCollection::make(function(){
+
             $handle = fopen($this->filePath, 'r');
+
             while ( ($line = fgets($handle)) !== false) {
                 yield $line;
             }
@@ -64,10 +66,12 @@ class LazyCollectionsTest extends TestCase
     public function testRegularCollection()
     {
         $memory = memory_get_usage();
+
         $c = $this->getRegularFileReader();
         $c->each(function ($el){
             $this->assertStringContainsString('abc', $el);
         });
+
         $memoryDelta = memory_get_usage() - $memory;
         $this->assertGreaterThan(900000, $memoryDelta);
     }
