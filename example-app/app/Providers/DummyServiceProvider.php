@@ -7,6 +7,7 @@ use App\ConcreteClasses\DummyImplOne;
 use App\ConcreteClasses\InjectTest;
 use App\ConcreteClasses\ToExtend;
 use App\Contracts\DummyContract;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use stdClass;
 
@@ -23,6 +24,7 @@ class DummyServiceProvider extends ServiceProvider
         $this->whenNeedsBind();
         $this->tagging();
         $this->extends();
+        $this->containerEvents();
     }
 
     /**
@@ -105,5 +107,20 @@ class DummyServiceProvider extends ServiceProvider
                 };
             }
         );
+    }
+    private function containerEvents()
+    {
+        // for object of any type
+        $this->app->resolving(function ($object, $app){
+            $str = is_object($object) ? get_class($object) : $object;
+            //echo $str; // Log::info("Resolving " . $str );
+        });
+        // for specific object
+        $this->app->resolving(
+            DummyContract::class,
+            function ($object, $app){
+            $str =  is_object($object) ? get_class($object) : $object;
+            Log::info("Resolving DummyContract: " . $str);
+        });
     }
 }
