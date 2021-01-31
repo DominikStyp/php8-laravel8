@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\ConcreteClasses\DummyImplOne;
 use App\ConcreteClasses\InjectTest;
+use App\ConcreteClasses\ToExtend;
 use App\Contracts\DummyContract;
 use Illuminate\Container\RewindableGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -49,5 +50,14 @@ class ContainerBindingTest extends TestCase
             $this->assertInstanceOf(\stdClass::class, $std);
             $this->assertCount(3, $std->values);
         }
+    }
+
+    public function test_extend(){
+        /** @var ToExtend $obj */
+        $obj = $this->app->make(ToExtend::class);
+        $this->assertEquals("overridden test", $obj->test());
+        $this->assertEquals("original", $obj->original());
+        $this->assertEquals("original x", $obj->originalX());
+        $this->assertEquals("original z", $obj->originalZ());
     }
 }
