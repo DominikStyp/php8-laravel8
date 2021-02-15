@@ -1,12 +1,7 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\ResourceController;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\ResourceControllerAbstract;
-use Tests\ResourceControllerTestInterface;
-use Tests\TestCase;
 
 class ProductControllerTest extends ResourceControllerAbstract
 {
