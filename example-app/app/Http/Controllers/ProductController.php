@@ -31,7 +31,7 @@ class ProductController extends Controller {
      * GET
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index(Request $request) {
         return new JsonResponse([
@@ -45,7 +45,7 @@ class ProductController extends Controller {
      * GET
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function create(Request $request) {
         return new JsonResponse([
@@ -59,8 +59,8 @@ class ProductController extends Controller {
      * POST
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
     public function store(Request $request) {
         return new JsonResponse([
@@ -76,7 +76,7 @@ class ProductController extends Controller {
      *
      * @param int $id
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function show(int $id, Request $request) {
         return new JsonResponse([
@@ -93,7 +93,7 @@ class ProductController extends Controller {
      *
      * @param int $id
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function edit(int $id, Request $request) {
         return new JsonResponse([
@@ -109,8 +109,8 @@ class ProductController extends Controller {
      * Update the specified resource in storage.
      *
      * @param int $id
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
     public function update(int $id, Request $request) {
         return new JsonResponse([
@@ -127,7 +127,7 @@ class ProductController extends Controller {
      *
      * @param int $id
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroy(int $id, Request $request) {
         return new JsonResponse([
