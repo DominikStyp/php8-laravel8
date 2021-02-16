@@ -1,12 +1,10 @@
 <?php
 
 
-namespace Tests;
+namespace Tests\Feature\ResourceController;
+use Tests\TestCase;
 
-
-abstract class ResourceControllerAbstract
-    extends TestCase
-    implements  ResourceControllerTestInterface {
+abstract class ResourceControllerAbstract extends TestCase {
 
     protected function jsonGet(string $uri): \stdClass {
         $response = $this->json("GET", $uri);
