@@ -2,18 +2,25 @@
 
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+/**
+ * Important to note:
+ *  - order of attributes MATTERS
+ *  -
+ */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/slug/{productSlug}/{YYMMDD}/{time?}', function(string $productSlug, string $date, $time = '00:00'){
+    echo "Product slug:{$productSlug}<br />date: {$date}<br />time: {$time}";
+})
+    ->where([
+        "productSlug" => "[a-zA-Z0-9-]+",
+        "time" => "\d{2}:\d{2}"
+    ]);
+
 Route::resource('/product', \App\Http\Controllers\ProductController::class);
+
+Route::middleware(['is_admin'])
+     ->prefix('/admin')
+     ->namespace('\App\Http\Controllers\Admin')
+     ->group(function (){
+         Route::get('/check', 'Check');
+     });

@@ -37,6 +37,8 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->configureRateLimiting();
 
+        $this->defineDefaultRegexConstraintsForAttributes();
+
         $this->routes(function () {
             Route::prefix('api')
                 ->middleware('api')
@@ -47,6 +49,10 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
         });
+    }
+
+    protected function defineDefaultRegexConstraintsForAttributes() {
+        Route::pattern('YYMMDD', '\d{4}-\d{2}-\d{2}');
     }
 
     /**
