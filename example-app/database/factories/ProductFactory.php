@@ -22,7 +22,8 @@ class ProductFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => implode(" ", $this->faker->words(2)),
+            'description' => $this->faker->sentence
         ];
     }
 }
