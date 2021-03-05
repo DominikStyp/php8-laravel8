@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -39,6 +40,8 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->defineDefaultRegexConstraintsForAttributes();
 
+        $this->defineCustomResolutions();
+
         $this->routes(function () {
             Route::prefix('api')
                 ->middleware('api')
@@ -51,8 +54,29 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
-    protected function defineDefaultRegexConstraintsForAttributes() {
+    protected function defineDefaultRegexConstraintsForAttributes()
+    {
         Route::pattern('YYMMDD', '\d{4}-\d{2}-\d{2}');
+    }
+
+    protected function defineCustomResolutions()
+    {
+        Route::bind("userSlug", function ($value) {
+            if(empty($value)){
+                return null;
+            }
+            $words = preg_split("#[-]+#si", $value);
+            $builder = User::query();
+            foreach($words as $w){
+                if(empty($w)){
+                    continue;
+                }
+                $builder->where('name', 'like', "%{$w}%");
+            }
+            //dd($builder->getQuery()->dump());
+            return $builder->firstOrFail();
+
+        });
     }
 
     /**
