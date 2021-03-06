@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -24,3 +25,8 @@ Route::middleware(['is_admin'])
      ->group(function (){
          Route::get('/check', 'Check');
      });
+
+// binded route
+Route::get("/user/{userSlug}", function(?User $user){
+    return $user;
+});
