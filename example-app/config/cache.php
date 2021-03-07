@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('CACHE_DRIVER', 'file'),
+    'default' => env('CACHE_DRIVER', 'redis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -76,7 +76,7 @@ return [
         'redis' => [
             'driver' => 'redis',
             'connection' => 'cache',
-            'lock_connection' => 'default',
+            'lock_connection' => 'default'
         ],
 
         'dynamodb' => [
