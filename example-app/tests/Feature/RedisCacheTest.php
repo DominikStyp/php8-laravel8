@@ -65,6 +65,8 @@ class RedisCacheTest extends TestCase
         $this->assertNull($obj);
     }
 
+
+
     public function test_retrieve_and_store_in_one_operation()
     {
         $store = Cache::store('redis');
@@ -107,7 +109,8 @@ class RedisCacheTest extends TestCase
         $this->assertNull( $store->get('test6') );
     }
 
-    public function test_add_only_if_item_doesnt_exist() {
+    public function test_add_only_if_item_doesnt_exist()
+    {
         $store = Cache::store('redis');
         $store->flush(); // clear entire cache
         $store->put("test7", "first_value", 10);
@@ -121,6 +124,35 @@ class RedisCacheTest extends TestCase
         $this->assertEquals("second_value", $store->get("test7"));
     }
 
+    public function test_cache_helper_function()
+    {
+        cache()->flush();
+        cache(['test8' => '123456'], 2);
+        $this->assertEquals('123456', cache()->get('test8'));
+        sleep(3);
+        $this->assertNull( cache()->get('test8') );
+    }
+
+    public function test_cache_tags()
+    {
+        Cache::flush();
+        Cache::tags(['tag1', 'tag2'])->set('test9', '2222', 5);
+        /**
+         * WARNING! Both tags must match the original values
+         * if only tag1 matches, you will get 'null' result
+         * as docs says:
+         * "To retrieve a tagged cache item, pass the same ordered list of tags"
+         */
+        $this->assertEquals('2222', Cache::tags(['tag1', 'tag2'])->get('test9'));
+
+        // not the SAME tags order so we get 'null'
+        $this->assertNull( Cache::tags(['tag2', 'tag1'])->get('test9') );
+
+        // flushing tags works with either BOTH or just ONE tag from the list
+        // following flushes all records related to 'tag2'
+        Cache::tags(['tag2'])->flush();
+        $this->assertNull( Cache::tags(['tag1', 'tag2'])->get('test9') );
+    }
 
     public function test_increment()
     {
