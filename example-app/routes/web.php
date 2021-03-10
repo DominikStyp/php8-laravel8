@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Route;
  *  -
  */
 
+Route::post('/upload_files', \App\Http\Controllers\UploadFiles::class);
+
 Route::get('/slug/{productSlug}/{YYMMDD}/{time?}', function(string $productSlug, string $date, $time = '00:00'){
     echo "Product slug:{$productSlug}<br />date: {$date}<br />time: {$time}";
 })
