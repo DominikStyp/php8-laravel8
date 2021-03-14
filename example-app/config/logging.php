@@ -37,7 +37,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['dominik_custom','single', 'daily'],
+            'channels' => ['single', 'daily'],
             'ignore_exceptions' => false,
         ],
 
