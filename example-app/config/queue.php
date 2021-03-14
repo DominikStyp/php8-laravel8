@@ -34,6 +34,13 @@ return [
             'driver' => 'sync',
         ],
 
+        'high-priority-queue' => [
+            'driver' => 'database',
+            'table' => 'jobs',
+            'queue' => 'high-priority-queue',
+            'retry_after' => 90,
+        ],
+
         'database' => [
             'driver' => 'database',
             'table' => 'jobs',
