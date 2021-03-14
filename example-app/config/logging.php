@@ -37,8 +37,13 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => ['dominik_custom','single', 'daily'],
             'ignore_exceptions' => false,
+        ],
+
+        'dominik_custom' => [
+            'driver' => 'custom',
+            'via' => \App\Logging\DominikCustomLogger::class,
         ],
 
         'single' => [

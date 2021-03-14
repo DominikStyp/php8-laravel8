@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use GuzzleHttp\Psr7\MimeType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Mime\MimeTypes;
 use Tests\TestCase;
 
 class FileUploadTest extends TestCase
@@ -47,9 +49,23 @@ class FileUploadTest extends TestCase
         // Assert the file was stored...
         Storage::disk('images')->assertExists("uploaded/".$file->hashName());
 
-        $uploadedSize = Storage::disk('images')
-            ->size("uploaded/".$file->hashName());
-        $this->assertEquals($file->getSize(), $uploadedSize);
+    }
+
+    public function test_put_and_get_file()
+    {
+        Storage::fake('logs');
+
+        $file = UploadedFile::fake()->create('some_file.log', 5, 'text/plain');
+
+        Storage::putFileAs('logs', $file, 'fancy_file.log', ['public']);
+
+        Storage::assertExists('logs/fancy_file.log');
+
+        Storage::append('logs/fancy_file.log', 'abc');
+
+        $fetched = Storage::get('logs/fancy_file.log');
+
+        $this->assertEquals("\r\nabc", $fetched);
 
     }
 }
