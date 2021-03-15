@@ -18,9 +18,9 @@ class FailingJobTest extends TestCase
 
         FailingJob::dispatch()
             ->onConnection('database')
-            ->onQueue('high-priority-queue');
+            ->onQueue('high-priority');
 
-        shell_exec("php artisan queue:work --queue=high-priority-queue,default --stop-when-empty");
+        shell_exec("php artisan queue:work --queue=high-priority,medium-priority,default --stop-when-empty");
         sleep(5);
 
         $this->assertFileExists($logFile);
