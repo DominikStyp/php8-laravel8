@@ -21,6 +21,36 @@ Route::get('/slug/{productSlug}/{YYMMDD}/{time?}', function(string $productSlug,
 
 Route::resource('/product', \App\Http\Controllers\ProductController::class);
 
+
+Route::middleware(['is_admin_by_session'])
+    ->get('/is_admin_by_session', function(){
+        return new \Illuminate\Http\JsonResponse(['status' => 'ok']);
+    });
+
+Route::get('/test_set_flash_var', function(\Illuminate\Http\Request $request){
+    $var = 'abc123';
+    if($request->has('now')){ // this will ONLY keep the variable for THIS request
+        $request->session()->now('flash_var', $var);
+        new \Illuminate\Http\JsonResponse(
+            ['flash_var' => $request->session()->get('flash_var') ]
+        );
+    } else {
+        $request->session()->flash('flash_var', $var);
+    }
+    return new \Illuminate\Http\JsonResponse(['flash_var' => $var]);
+})->name('set_flash');
+
+Route::get('/test_get_flash_var', function(\Illuminate\Http\Request $request){
+        if($request->has('reflash')) {
+            $request->session()->reflash(); // keep for additional request
+        }
+        if($request->has('keep')){
+            $request->session()->keep(['flash_var']);
+        }
+        return new \Illuminate\Http\JsonResponse(['flash_var' => $request->session()->get('flash_var')]);
+    })->name('get_flash');
+
+
 Route::middleware(['is_admin'])
      ->prefix('/admin')
      ->namespace('\App\Http\Controllers\Admin')
