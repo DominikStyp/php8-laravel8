@@ -46,6 +46,12 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+
+        // dummy guard @see AuthServiceProvider for details
+        'dummy-guard' => [
+            'driver' => 'dummy-guard-driver',
+            'provider' => 'users'
+        ]
     ],
 
     /*
