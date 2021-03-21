@@ -66,3 +66,7 @@ Route::middleware(['is_admin'])
 Route::get("/user/{userSlug}", function(?User $user){
     return $user;
 });
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
