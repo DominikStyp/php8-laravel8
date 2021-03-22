@@ -1,12 +1,9 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-
-Route::get("/", function(\Illuminate\Http\Request $request){
-   return view('welcome');
-});
 Route::post('/upload_files', \App\Http\Controllers\UploadFiles::class);
 
 
@@ -69,4 +66,5 @@ Route::get("/user/{userSlug}", function(?User $user){
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])
+    ->name('home');
