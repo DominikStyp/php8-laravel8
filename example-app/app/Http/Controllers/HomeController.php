@@ -23,6 +23,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        return view('home', [
+            'escaped' => '<b style="color:green">Escaped</b>',
+            'unescaped' => '<b style="color:red">Unescaped</b>'
+        ]);
     }
 }
