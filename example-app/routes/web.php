@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/upload_files', \App\Http\Controllers\UploadFiles::class);
 
 
+Route::post('/validate_me', '\App\Http\Controllers\ValidateMeController@post')->name('validate_me_post');
 /**
  * Important to note:
  *  - order of attributes MATTERS
