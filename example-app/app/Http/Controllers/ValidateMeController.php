@@ -10,4 +10,9 @@ class ValidateMeController extends Controller
     {
         return response("OK");
     }
+
+    public function get(PostValidateMeRequest $request)
+    {
+        return view('validate-me');
+    }
 }
