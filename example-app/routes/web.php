@@ -69,3 +69,15 @@ Auth::routes();
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])
     ->name('home');
+
+Route::get('/validate-me', [App\Http\Controllers\ValidateMeController::class, 'get']);
+
+Route::get('/test_loc/{locale?}', function(\Illuminate\Http\Request $request){
+    dump($request->something);
+});
+
+Route::get('mailable', function () {
+    return (new App\Mail\TestMarkdownEmail());
+    // to get HTML as string use:
+    // return (new App\Mail\TestMarkdownEmail())->render();
+});
