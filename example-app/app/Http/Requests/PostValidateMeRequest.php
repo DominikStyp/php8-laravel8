@@ -27,7 +27,7 @@ class PostValidateMeRequest extends FormRequest
     {
         return [
             'name' => 'required|min:5|max:100',
-            'email' => 'email'
+            'email' => 'required|email:rfc,dns'
         ];
     }
 
