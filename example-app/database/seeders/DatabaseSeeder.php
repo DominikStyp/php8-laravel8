@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        (new CategorySeeder())->run();
         (new ProductSeeder())->run();
         (new UserSeeder())->run();
     }

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,7 +24,8 @@ class ProductFactory extends Factory
     {
         return [
             'name' => implode(" ", $this->faker->words(2)),
-            'description' => $this->faker->sentence
+            'description' => $this->faker->sentence,
+            'category_id' => Category::findOrFail(mt_rand(1,10))->id
         ];
     }
 }
