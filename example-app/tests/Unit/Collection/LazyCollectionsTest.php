@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Collection;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
@@ -14,7 +14,7 @@ class LazyCollectionsTest extends TestCase
     protected function setUp(): void {
         parent::setUp();
 
-        $this->filePath = dirname(__FILE__).'/../../storage/logs/'.$this->file;
+        $this->filePath = dirname(__FILE__).'/../../../storage/logs/'.$this->file;
 
         if(!file_exists($this->filePath)){
             $this->createTestLogFile();
