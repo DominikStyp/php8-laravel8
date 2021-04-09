@@ -67,8 +67,9 @@ class CrossJoin_Join_Intersect_Zip_Test extends TestCase
         $this->assertEquals(null, $zipped[2][1]);
     }
 
-    // search by common part
-    // merge/join collection
+    /**
+     * search the common part in the 2 collections
+     */
     public function testIntersect() {
         $roles = ['admin', 'mod', 'subscriber', 'new', 'inactive'];
 
@@ -84,29 +85,35 @@ class CrossJoin_Join_Intersect_Zip_Test extends TestCase
         $this->assertEquals(2, $commonRoles->count());
     }
 
-    // search by common keys
-    // merge/join collection
+    /**
+     * search the common part by keys
+     */
     public function testIntersectByKeys() {
         $c = collect([
-            'x' => 'xx',
-            'y' => 'yy',
-            'z' => 'zz'
+            'id' => 1,
+            'name' => 'Ann',
+            'surname' => 'White',
+            'health_insurance' => true
         ]);
 
+        // USAGE EXAMPLE: we can force to remove keys from the initial collection
+        //                that ARE NOT PRESENT in the second collection
+        //                yet we retain values from original collection
         $intersect = $c->intersectByKeys([
-            'a' => 'aaa',
-            'x' => '123',
-            'z' => '444',
+            'id' => 0,
+            'name' => '[placeholder]',
+            'surname' => '[placeholder]',
+            'status' => null
         ]);
 
-        /**
-        [
-        "x" => "xx"
-        "z" => "zz"
-        ]
-         */
-        $this->assertTrue( $intersect->has('x') );
-        $this->assertTrue( $intersect->has('z') );
+        // value from the first collection
+        $this->assertEquals( 'Ann', $intersect->get('name') );
+        // value from the first collection
+        $this->assertEquals( 'White', $intersect->get('surname') );
+        // not common key so removed
+        $this->assertEmpty( $intersect->get('status') );
+        $this->assertEmpty( $intersect->get('health_insurance') );
+
     }
 
 }

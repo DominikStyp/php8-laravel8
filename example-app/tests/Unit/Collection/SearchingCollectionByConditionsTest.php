@@ -4,7 +4,7 @@ namespace Tests\Unit\Collection;
 
 use PHPUnit\Framework\TestCase;
 
-class SearchingByValAndWhereConditionTest extends TestCase
+class SearchingCollectionByConditionsTest extends TestCase
 {
 
 
@@ -37,11 +37,11 @@ class SearchingByValAndWhereConditionTest extends TestCase
 
         $this->assertFalse($c->contains(5));
 
-        $res = $c->contains(function ($val, $key){
+        $boolRes = $c->contains(function ($val, $key){
             return $val > 7;
         });
 
-        $this->assertFalse($res);
+        $this->assertFalse($boolRes);
     }
 
 

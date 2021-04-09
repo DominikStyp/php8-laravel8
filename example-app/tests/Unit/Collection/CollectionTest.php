@@ -12,83 +12,6 @@ use PHPUnit\Framework\TestCase;
 
 class CollectionTest extends TestCase{
 
-    /**
-     * @var \Illuminate\Support\Collection
-     */
-    private $collection;
-    protected function setUp(): void {
-        $this->collection = collect([
-            [
-                'id' => 1,
-                'name' => 'user1',
-                'surname' => 'ccc',
-            ],
-            [
-                'id' => 11,
-                'name' => 'user1',
-                'surname' => 'aaa',
-            ],
-            [
-                'id' => 2,
-                'name' => 'user2',
-                'email' => 'user2@user2.example.com',
-                'surname' => 'bbb',
-            ],
-            [
-                'id' => 3,
-                'name' => 'user3',
-                'surname' => 'zzz',
-            ],
-            [
-                'id' => 4,
-                'name' => 'user4',
-                'surname' => 'ttt',
-            ],
-        ]);
-        parent::setUp();
-    }
-
-    public function testCollapse() {
-        $collection = collect([
-            [
-                'id' => 1,
-                'name' => 'user1',
-                'surname' => 'ccc',
-            ],
-            [
-                'id' => 11,
-                'name' => 'user1',
-                'surname' => 'aaa',
-            ],
-            [
-                'id' => 2,
-                'name' => 'user2',
-                'email' => 'user2@user2.example.com',
-                'surname' => 'bbb',
-            ],
-            [
-                'id' => 3,
-                'name' => 'user3',
-                'surname' => 'zzz',
-            ],
-            [
-                'id' => 4,
-                'name' => 'user4',
-                'surname' => 'ttt',
-            ],
-        ]);
-
-        $collapsed = $collection->collapse();
-
-        $this->assertCount(4, $collapsed);
-
-        /**
-         * WARNING! if keys of sub-arrays are the same, last element overrides all previous keys
-         */
-        $this->assertEquals(4, $collapsed['id']);
-        $this->assertEquals("user2@user2.example.com", $collapsed['email']);
-    }
-
 
     public function testCountBy() {
         $c = collect(['alice@gmail.com', 'bob@yahoo.com', 'carlos@gmail.com']);
@@ -129,39 +52,6 @@ class CollectionTest extends TestCase{
 
     }
 
-    public function testFlatMap(){
-        $configs = collect([
-            ['app_key' => '123_gggg', 'user_key' => '456-hhh'],
-            ['user_email' => 'u@ux.com', 'some_other_key' => 'xxxx']
-        ]);
-
-        $flat = $configs->flatMap(function($values){ // only values of all keys are passed here
-            return array_map('strtoupper', $values);
-        });
-
-        $this->assertEquals('123_GGGG', $flat['app_key']);
-    }
-
-    public function testFlatten(){
-        $c = collect([
-            'one' => 1,
-            'two' => [
-                'three' => [
-                    'four'
-                ]
-            ],
-            'x' => 'four'
-        ]);
-        $f = $c->flatten();
-        /*
-         * [
-                0 => 1
-                1 => "four"
-                2 => "four"
-            ]
-         */
-        $this->assertCount(3, $f);
-    }
 
     /**
      *  @COOL
@@ -187,16 +77,6 @@ class CollectionTest extends TestCase{
         $this->assertCount(3, $f);
     }
 
-
-    public function testMax(){
-        $c = collect([
-            ['cnt' => 99],
-            ['cnt' => 10],
-            ['cnt' => '100'],
-        ]);
-
-        $this->assertEquals(100, $c->max('cnt'));
-    }
 
     public function testPadNumberWithCollection(){
         $numToPad = 32;
