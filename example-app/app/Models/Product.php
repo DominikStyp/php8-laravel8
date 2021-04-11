@@ -14,4 +14,9 @@ class Product extends Model
         'description',
         'stock_amount',
     ];
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
 }

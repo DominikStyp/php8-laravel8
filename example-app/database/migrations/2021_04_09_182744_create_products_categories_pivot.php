@@ -14,7 +14,7 @@ class CreateProductsCategoriesPivot extends Migration
      */
     public function up()
     {
-        Schema::create('products_categories', function (Blueprint $table) {
+        Schema::create('category_product', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("product_id");
             $table->unsignedBigInteger("category_id");
@@ -34,7 +34,7 @@ class CreateProductsCategoriesPivot extends Migration
     public function down()
     {
         DB::statement("SET FOREIGN_KEY_CHECKS=0;");
-        Schema::dropIfExists('products_categories');
+        Schema::dropIfExists('category_product');
         DB::statement("SET FOREIGN_KEY_CHECKS=1;");
 
     }

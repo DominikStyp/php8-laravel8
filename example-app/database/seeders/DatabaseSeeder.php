@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
         (new CategorySeeder())->run();
         (new ProductSeeder())->run();
         (new UserSeeder())->run();
+        (new ProductsCategoriesSeeder())->run();
     }
 }

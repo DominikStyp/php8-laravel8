@@ -25,8 +25,7 @@ class ProductFactory extends Factory
         return [
             'name' => implode(" ", $this->faker->words(2)),
             'description' => $this->faker->sentence,
-            'stock_amount' => 0,
-            'category_id' => Category::findOrFail(mt_rand(1,10))->id
+            'stock_amount' => 0
         ];
     }
 }
