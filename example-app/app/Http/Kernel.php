@@ -5,6 +5,7 @@ namespace App\Http;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\IsAdminBySession;
+use App\Http\Middleware\ProductWithParameters;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Auth\Middleware\AuthenticateWithBasicAuth;
 use Illuminate\Auth\Middleware\Authorize;
@@ -103,6 +104,7 @@ class Kernel extends HttpKernel
         'throttle' => ThrottleRequests::class,
         'verified' => EnsureEmailIsVerified::class,
         'is_admin' => IsAdmin::class,
-        'is_admin_by_session' => IsAdminBySession::class
+        'is_admin_by_session' => IsAdminBySession::class,
+        'product_with_parameters' => ProductWithParameters::class,
     ];
 }

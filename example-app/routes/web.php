@@ -23,6 +23,9 @@ Route::get('/slug/{productSlug}/{YYMMDD}/{time?}', function(string $productSlug,
 
 Route::resource('/product', \App\Http\Controllers\ProductController::class);
 
+Route::get('/product_middleware_check', [\App\Http\Controllers\ProductController::class, 'withParamsCheck'])
+        ->middleware('product_with_parameters:stock_amount,1');
+
 
 Route::middleware(['is_admin_by_session'])
     ->get('/is_admin_by_session', function(){

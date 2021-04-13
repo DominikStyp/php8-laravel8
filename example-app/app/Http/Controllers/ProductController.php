@@ -27,6 +27,11 @@ class ProductController extends Controller {
         ];
     }
 
+    public function withParamsCheck()
+    {
+        return "Checked!";
+    }
+
     /**
      * GET
      * Display a listing of the resource.
