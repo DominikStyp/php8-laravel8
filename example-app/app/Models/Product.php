@@ -15,6 +15,11 @@ class Product extends Model
         'stock_amount',
     ];
 
+    public function isEven(): bool
+    {
+        return $this->id % 2 === 0;
+    }
+
     public function categories()
     {
         return $this->belongsToMany(Category::class);
