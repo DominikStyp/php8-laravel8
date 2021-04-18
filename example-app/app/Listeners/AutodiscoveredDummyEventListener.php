@@ -5,8 +5,9 @@ namespace App\Listeners;
 use App\Events\DummyEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
-class DummyEventListeners
+class AutodiscoveredDummyEventListener
 {
     /**
      * Create the event listener.
@@ -21,11 +22,11 @@ class DummyEventListeners
     /**
      * Handle the event.
      *
-     * @param  DummyEvent  $event
+     * @param  object  $event
      * @return void
      */
     public function handle(DummyEvent $event)
     {
-        //
+        Log::info(__METHOD__);
     }
 }
