@@ -19,8 +19,8 @@ class CreateProductsCategoriesPivot extends Migration
             $table->unsignedBigInteger("product_id");
             $table->unsignedBigInteger("category_id");
             $table->timestamps();
-            $table->foreign("product_id")->references("id")->on("products");
-            $table->foreign("category_id")->references("id")->on("categories");
+            $table->foreign("product_id")->references("id")->on("products")->cascadeOnDelete();
+            $table->foreign("category_id")->references("id")->on("categories")->cascadeOnDelete();
             // in newer version can be defined as
             // $table->foreignId('product_id')->constrained();
         });
