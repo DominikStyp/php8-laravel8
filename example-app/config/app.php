@@ -174,8 +174,10 @@ return [
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
         // my additional providers
         App\Providers\DummyServiceProvider::class,
+        App\Providers\EloquentBuilderExtensionProvider::class,
 
     ],
 
