@@ -49,7 +49,8 @@ class ImportTableFromSQL extends Command
 
         $this->line("Importing table {$table}");
 
-        $command = 'mysql -u "${:USERNAME}" -h "${:DB_HOST}" -p"${:PASSWORD}" "${:DB_NAME}" < "${:TARGET_FILE}"';
+        $passwordPart = empty(config('database.connections.mysql.password')) ? '' : '-p"${:PASSWORD}"';
+        $command = 'mysql -u "${:USERNAME}" -h "${:DB_HOST}" '.$passwordPart.' "${:DB_NAME}" < "${:TARGET_FILE}"';
 
         // we use cross-platform process factory
         // @see: https://symfony.com/doc/current/components/process.html
@@ -62,6 +63,7 @@ class ImportTableFromSQL extends Command
         ]);
 
         $this->line( json_encode($process->getEnv(), JSON_PRETTY_PRINT) );
+        $this->line( $process->getCommandLine() );
 
         $process->run();
 
